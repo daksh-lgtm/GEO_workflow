@@ -7,7 +7,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 #app title
-app=FastAPI("Product Crawler webpage")
+app = FastAPI(title="Product Crawler Webpage")
 
 #routing to data to data folder
 DATA_FOLDER="data"
