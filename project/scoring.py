@@ -129,14 +129,14 @@ class AIScoringEngine:
         breakdown = {}
 
         weighted_signals = {
-            "reviews_count":    4,   
-            "rating":           4,   
-            "return_policy":    3,
-            "warranty":         3,
-            "certifications":   3,
-            "secure_checkout":  2,
-            "brand_verified":   1,
-        }
+    "has_return_policy": 3,
+    "has_warranty_info": 3,
+    "has_shipping_info": 2,
+    "mentions_secure_payment": 2,
+    "has_contact_page": 2,
+    "mentions_reviews": 3,
+    "uses_https": 1
+}
 
         for signal, weight in weighted_signals.items():
             value = self.trust.get(signal)

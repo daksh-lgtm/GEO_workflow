@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 from urllib.parse import urlparse
 from scoring import AIScoringEngine
+from llm_context import LLMContextBuilder
 
 #app title
 app = FastAPI(title="Product Crawler Webpage")
@@ -37,7 +38,9 @@ def generate_filename(url:str):
         filename = f"{domain}-{path}-{timestamp}.json"
         
         return os.path.join(DATA_FOLDER, filename)
-
+#=============================================================
+# Crawler page
+#=============================================================
 @app.post("/crawl_product")
 def crawl_product_page(request: CrawlRequest):
     try:
@@ -61,6 +64,9 @@ def crawl_product_page(request: CrawlRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+#=============================================================
+# scoring result
+#=============================================================
 @app.post("/score_product")
 def score_product(request: ScoreRequest):
 
@@ -77,4 +83,27 @@ def score_product(request: ScoreRequest):
 
     return {
         "ai_visibility_score": score_result
+    }
+#=============================================================
+# LLM context builder
+#=============================================================
+@app.post("/geo_context")
+def geo_context(request: ScoreRequest):
+
+    file_path = os.path.join(DATA_FOLDER, request.filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        crawl_data = json.load(f)
+
+    scorer = AIScoringEngine(crawl_data)
+    score_result = scorer.compute_score()
+
+    context_builder = LLMContextBuilder(crawl_data, score_result)
+    llm_context = context_builder.build_context()
+
+    return {
+        "llm_context": llm_context
     }
